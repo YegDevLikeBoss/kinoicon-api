@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: kinoicon
+      POSTGRES_USER: kinoicon
+      POSTGRES_PASSWORD: kinoicon
+    ports:
+      - "5432:5432"
+    volumes:
+      - kinoicon_pgdata:/var/lib/postgresql/data
+      - ./src/main/resources/db.sql:/docker-entrypoint-initdb.d/db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kinoicon"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: kinoicon
+      DB_USER: kinoicon
+      DB_PASSWORD: kinoicon
+      JWT_SECRET: change-this-secret-in-production-min-32-bytes-long
+      JWT_EXPIRATION_MINUTES: 60
+      SEARCH_SIMILARITY_THRESHOLD: 0.1
+    ports:
+      - "8080:8080"
+
+volumes:
+  kinoicon_pgdata:
