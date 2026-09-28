@@ -1,0 +1,70 @@
+# =========================
+# Gradle
+# =========================
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Gradle wrapper
+gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# =========================
+# IntelliJ IDEA
+# =========================
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# IntelliJ generated files
+out/
+
+# =========================
+# Java
+# =========================
+*.class
+*.log
+hs_err_pid*
+
+# =========================
+# Spring Boot
+# =========================
+# Local configuration / secrets
+application-local.yml
+application-local.yaml
+application-local.properties
+
+# Uncomment if application.yml contains secrets
+# application.yml
+# application.properties
+
+# =========================
+# Environment / secrets
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Temporary files
+# =========================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# =========================
+# Test / coverage
+# =========================
+/target/
+*.exec
+*.class
