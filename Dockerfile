@@ -1,23 +1,17 @@
 # --- Build stage ---
-FROM gradle:8.11-jdk21 AS build
-WORKDIR /workspace
-COPY build.gradle settings.gradle ./
+FROM gradle:8-jdk21 AS build
+WORKDIR /app
+COPY build.gradle* settings.gradle* gradlew ./
+COPY gradle ./gradle
+RUN ./gradlew --no-daemon dependencies > /dev/null 2>&1 || true
 COPY src ./src
-RUN gradle clean bootJar --no-daemon
+RUN ./gradlew --no-daemon bootJar -x test
 
 # --- Run stage ---
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre
+RUN useradd -r -u 1001 app
 WORKDIR /app
-COPY --from=build /workspace/build/libs/*.jar app.jar
-
-ENV DB_HOST=db \
-    DB_PORT=5432 \
-    DB_NAME=kinoicon \
-    DB_USER=kinoicon \
-    DB_PASSWORD=kinoicon \
-    JWT_SECRET=change-this-secret-in-production-min-32-bytes-long \
-    JWT_EXPIRATION_MINUTES=60 \
-    SEARCH_SIMILARITY_THRESHOLD=0.1
-
+COPY --from=build /app/target/*.jar app.jar
+USER app
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

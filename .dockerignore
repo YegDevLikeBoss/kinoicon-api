@@ -3,3 +3,12 @@ build/
 *.log
 .idea/
 *.iml
+.git
+.github
+.gradle
+.idea
+build
+out
+*.md
+.env
+docker-compose.yml
