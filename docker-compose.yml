@@ -2,6 +2,15 @@ services:
   db:
     image: postgres:18
     restart: unless-stopped
+    mem_limit: 120m
+    memswap_limit: 200m
+    command: >
+      postgres
+      -c shared_buffers=32MB
+      -c max_connections=20
+      -c work_mem=2MB
+      -c maintenance_work_mem=16MB
+      -c effective_cache_size=128MB
     environment:
       POSTGRES_USER: kinoicon
       POSTGRES_DB: kinoicon
@@ -17,6 +26,8 @@ services:
   app:
     image: ${APP_IMAGE}
     restart: unless-stopped
+    mem_limit: 300m
+    memswap_limit: 400m        # до ~100 МБ swap сверх лимита
     depends_on:
       db:
         condition: service_healthy
@@ -26,7 +37,18 @@ services:
       DB_NAME: kinoicon
       DB_USER: kinoicon
       DB_PASSWORD: ${DB_PASSWORD}
-      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75"
+      JAVA_TOOL_OPTIONS: >-
+        -Xms48m
+        -Xmx160m
+        -XX:+UseSerialGC
+        -XX:MaxMetaspaceSize=96m
+        -XX:ReservedCodeCacheSize=48m
+        -XX:MaxDirectMemorySize=32m
+        -Xss512k
+        -XX:+ExitOnOutOfMemoryError
+      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "4"
+      SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "2"
+      SERVER_TOMCAT_THREADS_MAX: "30"
     ports:
       - "127.0.0.1:8080:8080"
 
