@@ -135,7 +135,7 @@ public class FilmMapper {
 
     public static FilmSummaryCrewMemberResponse toSummaryCrewMemberResponse(PersonEntity entity) {
         return new FilmSummaryCrewMemberResponse(
-                entity.getUuid().toString(),
+                (entity.getUuid() != null) ? entity.getUuid().toString() : null,
                 entity.getId(),
                 (entity.getName() != null) ? NameMapper.toResponse(entity.getName()) : new NameResponse(null, null, null)
         );
