@@ -53,9 +53,9 @@ public class FilmServiceImpl implements FilmService {
                 yield FilmMapper.toResponse(film, crew);
             }
             case SUMMARY -> {
-                String director = joinNamesByRole(crewRows, personsById(crewRows), "director");
-                String mainActors = joinNamesByRole(crewRows, personsById(crewRows), "actor");
-                yield FilmMapper.toSummaryResponse(film, director, mainActors);
+                List<PersonEntity> directors = filterByRole(crewRows, personsById(crewRows), "director");
+                List<PersonEntity> mainActors = filterByRole(crewRows, personsById(crewRows), "actor");
+                yield FilmMapper.toSummaryResponse(film, (!directors.isEmpty()) ? directors.getFirst() : new PersonEntity(), mainActors);
             }
             case MINIMAL -> FilmMapper.toMinimalResponse(film);
         };
@@ -78,6 +78,16 @@ public class FilmServiceImpl implements FilmService {
                 .collect(Collectors.toMap(PersonEntity::getId, p -> p));
     }
 
+    private List<PersonEntity> filterByRole(List<FilmCrewEntity> crewRows, Map<Long, PersonEntity> persons, String role) {
+        return crewRows.stream()
+                .filter(c -> hasRole(c, role))
+                .map(c -> persons.get(c.getPersonId()))
+                .filter(java.util.Objects::nonNull)
+                .limit((role.equals("director")) ? 1 : 3)
+                .toList();
+    }
+
+    // TODO obsolete
     private String joinNamesByRole(List<FilmCrewEntity> crewRows, Map<Long, PersonEntity> persons, String role) {
         return crewRows.stream()
                 .filter(c -> hasRole(c, role))

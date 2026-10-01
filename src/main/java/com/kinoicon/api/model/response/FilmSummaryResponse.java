@@ -3,6 +3,7 @@ package com.kinoicon.api.model.response;
 import com.kinoicon.api.model.response.value.NameResponse;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record FilmSummaryResponse(
         String id,
@@ -10,6 +11,6 @@ public record FilmSummaryResponse(
         NameResponse name,
         LocalDate date,
         String cover_url,
-        String director,
-        String main_actors
+        FilmSummaryCrewMemberResponse director,
+        List<FilmSummaryCrewMemberResponse> main_actors
 ) {}

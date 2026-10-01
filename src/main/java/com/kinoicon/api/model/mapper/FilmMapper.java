@@ -6,9 +6,11 @@ import com.kinoicon.api.model.entity.PersonEntity;
 import com.kinoicon.api.model.request.FilmRequest;
 import com.kinoicon.api.model.request.value.CrewMemberRequest;
 import com.kinoicon.api.model.response.FilmResponse;
+import com.kinoicon.api.model.response.FilmSummaryCrewMemberResponse;
 import com.kinoicon.api.model.response.FilmSummaryResponse;
 import com.kinoicon.api.model.response.value.CrewMemberResponse;
 import com.kinoicon.api.model.response.value.FilmMinimalResponse;
+import com.kinoicon.api.model.response.value.NameResponse;
 import com.kinoicon.api.model.response.value.PersonSummaryResponse;
 
 import java.util.List;
@@ -45,7 +47,7 @@ public class FilmMapper {
         );
     }
 
-    public static FilmSummaryResponse toSummaryResponse(FilmEntity entity, String director, String mainActors) {
+    public static FilmSummaryResponse toSummaryResponse(FilmEntity entity, PersonEntity director, List<PersonEntity> mainActors) {
         if (entity == null) {
             return null;
         }
@@ -55,8 +57,8 @@ public class FilmMapper {
                 NameMapper.toResponse(entity.getName()),
                 entity.getDate(),
                 (entity.getMedia() != null) ? entity.getMedia().getCoverUrl() : null,
-                director,
-                mainActors
+                toSummaryCrewMemberResponse(director),
+                mainActors.stream().map(FilmMapper::toSummaryCrewMemberResponse).toList()
         );
     }
 
@@ -129,6 +131,14 @@ public class FilmMapper {
         entity.setOtherRoles(request.other_roles());
         entity.setNote(request.note());
         return entity;
+    }
+
+    public static FilmSummaryCrewMemberResponse toSummaryCrewMemberResponse(PersonEntity entity) {
+        return new FilmSummaryCrewMemberResponse(
+                entity.getUuid().toString(),
+                entity.getId(),
+                (entity.getName() != null) ? NameMapper.toResponse(entity.getName()) : new NameResponse(null, null, null)
+        );
     }
 
     public static boolean isPublished(FilmEntity entity) {
